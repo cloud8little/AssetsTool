@@ -1,0 +1,1 @@
+exocored tx assets UpdateParams 0x38D5d2B9E200Caf2b18fd758A11F34EAA8c519c0 0x000000000000000000000000000000000000000000000000000000000000000 --from test1 --keyring-backend test --gas-prices 7hua --node http://localhost:20000 --home node1/
