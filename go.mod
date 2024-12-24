@@ -1,4 +1,4 @@
-module assetcli
+module github.com/cloud8little/AssetsTool
 
 go 1.21.6
 
