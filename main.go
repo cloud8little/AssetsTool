@@ -412,6 +412,25 @@ var depositNSTCmd = &cobra.Command{
 	},
 }
 
+var withdrawNSTCmd = &cobra.Command{
+	Use:   "withdrawNST",
+	Short: "WithdrawNST to Exocore",
+	Run: func(cmd *cobra.Command, args []string) {
+		rpcUrl, _ := cmd.Flags().GetString("rpcUrl")
+		staker, _ := cmd.Flags().GetString("staker")
+		amountStr, _ := cmd.Flags().GetString("amount")
+		amount, ok := new(big.Int).SetString(amountStr, 10)
+		pubkey, _ := cmd.Flags().GetString("pubkey")
+		if !ok {
+			log.Fatalf("Invalid amount: %s", amountStr)
+		}
+		err := withdrawNST_(rpcUrl, pubkey, staker, amount)
+		if err != nil {
+			log.Fatalf("Failed to withdrawNST: %v", err)
+		}
+	},
+}
+
 var delegateCmd = &cobra.Command{
 	Use:   "delegate",
 	Short: "Delegate to Exocore",
@@ -465,6 +484,19 @@ var selfDelegateCmd = &cobra.Command{
 	},
 }
 
+var cancelSelfDelegateCmd = &cobra.Command{
+	Use:   "cancel-self-delegate",
+	Short: "Cancel self delegate to Exocore",
+	Run: func(cmd *cobra.Command, args []string) {
+		rpcUrl, _ := cmd.Flags().GetString("rpcUrl")
+		staker, _ := cmd.Flags().GetString("staker")
+		err := cancelSelfDelegate_(rpcUrl, staker[2:])
+		if err != nil {
+			log.Fatalf("Failed to cancel self delegate: %v", err)
+		}
+	},
+}
+
 var withdrawLSTCmd = &cobra.Command{
 	Use:   "withdraw",
 	Short: "WithdrawLST from Exocore",
@@ -494,6 +526,8 @@ func main() {
 	rootCmd.AddCommand(undelegateCmd)
 	rootCmd.AddCommand(withdrawLSTCmd)
 	rootCmd.AddCommand(depositNSTCmd)
+	rootCmd.AddCommand(withdrawNSTCmd)
+	rootCmd.AddCommand(cancelSelfDelegateCmd)
 
 	depositCmd.Flags().String("rpcUrl", "http://localhost:8545", "Exocore RPC URL")
 	depositCmd.Flags().String("staker", "", "Staker address")
@@ -521,6 +555,14 @@ func main() {
 	depositNSTCmd.Flags().String("staker", "", "Staker address")
 	depositNSTCmd.Flags().String("amount", "0", "Amount to deposit")
 	depositNSTCmd.Flags().String("pubkey", "", "pubkey")
+
+	withdrawNSTCmd.Flags().String("rpcUrl", "http://localhost:8545", "Exocore RPC URL")
+	withdrawNSTCmd.Flags().String("staker", "", "Staker address")
+	withdrawNSTCmd.Flags().String("amount", "0", "Amount to deposit")
+	withdrawNSTCmd.Flags().String("pubkey", "", "pubkey")
+
+	cancelSelfDelegateCmd.Flags().String("rpcUrl", "http://localhost:8545", "Exocore RPC URL")
+	cancelSelfDelegateCmd.Flags().String("staker", "", "Staker address")
 
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatalf("Error executing command: %v", err)
@@ -693,6 +735,48 @@ func selfDelegate_(rpcUrl, stakerAddr, operatorBench32Str string) error {
 	return waitForTransaction(ethClient, txID)
 }
 
+func cancelSelfDelegate_(rpcUrl, stakerAddr string) error {
+	delegateAddr := common.HexToAddress(delegatePrecompileAddress)
+
+	_, ethClient, err := connectToEthereum(rpcUrl)
+	if err != nil {
+		return err
+	}
+
+	sk, callAddr, err := getPrivateKeyAndAddress(privateKey)
+	if err != nil {
+		return err
+	}
+
+	chainID, err := ethClient.ChainID(context.Background())
+	if err != nil {
+		return err
+	}
+
+	delegateAbi, err := abi.JSON(strings.NewReader(DelegateABI))
+	if err != nil {
+		return err
+	}
+
+	staker, err := hex.DecodeString(stakerAddr)
+	if err != nil {
+		return err
+	}
+
+	data, err := delegateAbi.Pack("dissociateOperatorFromStaker", layerZeroID, staker)
+	if err != nil {
+		return err
+	}
+
+	txID, err := sendTransaction(ethClient, chainID, callAddr, sk, delegateAddr, data)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("Cancel Self Delegate Transaction ID:", txID)
+	return waitForTransaction(ethClient, txID)
+}
+
 func withdrawLST_(rpcUrl, stakerAddress string, amount *big.Int) error {
 	depositAddr := common.HexToAddress(depositPrecompileAddress)
 	assetAddr := common.HexToAddress(defaultAssetID)
@@ -772,6 +856,48 @@ func depositNST_(rpcUrl, pubkey string, stakerAddress string, amount *big.Int) e
 	}
 
 	fmt.Println("Deposit NST Transaction ID:", txID)
+	return waitForTransaction(ethClient, txID)
+}
+
+func withdrawNST_(rpcUrl, pubkey string, stakerAddress string, amount *big.Int) error {
+	depositAddr := common.HexToAddress(depositPrecompileAddress)
+	stakerAddr := common.HexToAddress(stakerAddress)
+	opAmount := amount
+	if len(pubkey) != 64 {
+		return fmt.Errorf("invalid pubkey length: %d", len(pubkey))
+	}
+	pubkeyBytes := common.Hex2Bytes(pubkey)
+	_, ethClient, err := connectToEthereum(rpcUrl)
+	if err != nil {
+		return err
+	}
+
+	sk, callAddr, err := getPrivateKeyAndAddress(privateKey)
+	if err != nil {
+		return err
+	}
+
+	chainID, err := ethClient.ChainID(context.Background())
+	if err != nil {
+		return err
+	}
+
+	depositAbi, err := abi.JSON(strings.NewReader(DepositABI))
+	if err != nil {
+		return err
+	}
+
+	data, err := depositAbi.Pack("withdrawNST", layerZeroID, pubkeyBytes, paddingAddressTo32(stakerAddr), opAmount)
+	if err != nil {
+		return err
+	}
+
+	txID, err := sendTransaction(ethClient, chainID, callAddr, sk, depositAddr, data)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("Withdraw NST Transaction ID:", txID)
 	return waitForTransaction(ethClient, txID)
 }
 
