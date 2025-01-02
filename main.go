@@ -370,8 +370,9 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "assetcli",
-	Short: "Asset CLI tool",
+	Use:     "assetcli",
+	Short:   "Asset CLI tool",
+	Version: "0.0.3",
 }
 
 var depositCmd = &cobra.Command{
@@ -739,7 +740,7 @@ func depositNST_(rpcUrl, pubkey string, stakerAddress string, amount *big.Int) e
 	if len(pubkey) != 64 {
 		return fmt.Errorf("invalid pubkey length: %d", len(pubkey))
 	}
-    pubkeyBytes := common.Hex2Bytes(pubkey)
+	pubkeyBytes := common.Hex2Bytes(pubkey)
 	_, ethClient, err := connectToEthereum(rpcUrl)
 	if err != nil {
 		return err
