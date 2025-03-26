@@ -358,7 +358,139 @@ const (
       "type": "function"
     }
   ]`
-	DelegateABI               = `[{"inputs":[{"internalType":"uint32","name":"clientChainID","type":"uint32"},{"internalType":"bytes","name":"staker","type":"bytes"},{"internalType":"bytes","name":"operator","type":"bytes"}],"name":"associateOperatorWithStaker","outputs":[{"internalType":"bool","name":"success","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint32","name":"clientChainID","type":"uint32"},{"internalType":"uint64","name":"lzNonce","type":"uint64"},{"internalType":"bytes","name":"assetsAddress","type":"bytes"},{"internalType":"bytes","name":"stakerAddress","type":"bytes"},{"internalType":"bytes","name":"operatorAddr","type":"bytes"},{"internalType":"uint256","name":"opAmount","type":"uint256"}],"name":"delegate","outputs":[{"internalType":"bool","name":"success","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint32","name":"clientChainID","type":"uint32"},{"internalType":"bytes","name":"staker","type":"bytes"}],"name":"dissociateOperatorFromStaker","outputs":[{"internalType":"bool","name":"success","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint32","name":"clientChainID","type":"uint32"},{"internalType":"uint64","name":"lzNonce","type":"uint64"},{"internalType":"bytes","name":"assetsAddress","type":"bytes"},{"internalType":"bytes","name":"stakerAddress","type":"bytes"},{"internalType":"bytes","name":"operatorAddr","type":"bytes"},{"internalType":"uint256","name":"opAmount","type":"uint256"}],"name":"undelegate","outputs":[{"internalType":"bool","name":"success","type":"bool"}],"stateMutability":"nonpayable","type":"function"}]`
+	DelegateABI               = `[
+  {
+    "type": "function",
+    "name": "associateOperatorWithStaker",
+    "inputs": [
+      {
+        "name": "clientChainID",
+        "type": "uint32",
+        "internalType": "uint32"
+      },
+      {
+        "name": "staker",
+        "type": "bytes",
+        "internalType": "bytes"
+      },
+      {
+        "name": "operator",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "success",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "delegate",
+    "inputs": [
+      {
+        "name": "clientChainID",
+        "type": "uint32",
+        "internalType": "uint32"
+      },
+      {
+        "name": "assetsAddress",
+        "type": "bytes",
+        "internalType": "bytes"
+      },
+      {
+        "name": "stakerAddress",
+        "type": "bytes",
+        "internalType": "bytes"
+      },
+      {
+        "name": "operatorAddr",
+        "type": "bytes",
+        "internalType": "bytes"
+      },
+      {
+        "name": "opAmount",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "success",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "dissociateOperatorFromStaker",
+    "inputs": [
+      {
+        "name": "clientChainID",
+        "type": "uint32",
+        "internalType": "uint32"
+      },
+      {
+        "name": "staker",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "success",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "undelegate",
+    "inputs": [
+      {
+        "name": "clientChainID",
+        "type": "uint32",
+        "internalType": "uint32"
+      },
+      {
+        "name": "assetsAddress",
+        "type": "bytes",
+        "internalType": "bytes"
+      },
+      {
+        "name": "stakerAddress",
+        "type": "bytes",
+        "internalType": "bytes"
+      },
+      {
+        "name": "operatorAddr",
+        "type": "bytes",
+        "internalType": "bytes"
+      },
+      {
+        "name": "opAmount",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "success",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  }
+]`
 	depositPrecompileAddress  = "0x0000000000000000000000000000000000000804"
 	delegatePrecompileAddress = "0x0000000000000000000000000000000000000805"
 )
@@ -615,7 +747,6 @@ func delegateTo_(rpcUrl, stakerAddress, operatorBench32Str string, amount *big.I
 	stakerAddr := common.HexToAddress(stakerAddress)
 	operatorAddr := []byte(operatorBench32Str)
 	opAmount := amount
-	lzNonce := uint64(0)
 	_, ethClient, err := connectToEthereum(rpcUrl)
 	if err != nil {
 		return err
@@ -636,7 +767,7 @@ func delegateTo_(rpcUrl, stakerAddress, operatorBench32Str string, amount *big.I
 		return err
 	}
 
-	data, err := delegateAbi.Pack("delegate", layerZeroID, lzNonce, paddingAddressTo32(assetAddr), paddingAddressTo32(stakerAddr), operatorAddr, opAmount)
+	data, err := delegateAbi.Pack("delegate", layerZeroID, paddingAddressTo32(assetAddr), paddingAddressTo32(stakerAddr), operatorAddr, opAmount)
 	if err != nil {
 		return err
 	}
@@ -656,7 +787,6 @@ func undelegate_(rpcUrl, stakerAddress, operatorBench32Str string, amount *big.I
 	stakerAddr := common.HexToAddress(stakerAddress)
 	operatorAddr := []byte(operatorBench32Str)
 	opAmount := amount
-	lzNonce := uint64(0)
 
 	_, ethClient, err := connectToEthereum(rpcUrl)
 	if err != nil {
@@ -678,7 +808,7 @@ func undelegate_(rpcUrl, stakerAddress, operatorBench32Str string, amount *big.I
 		return err
 	}
 
-	data, err := delegateAbi.Pack("undelegate", layerZeroID, lzNonce, paddingAddressTo32(assetAddr), paddingAddressTo32(stakerAddr), operatorAddr, opAmount)
+	data, err := delegateAbi.Pack("undelegate", layerZeroID, paddingAddressTo32(assetAddr), paddingAddressTo32(stakerAddr), operatorAddr, opAmount)
 	if err != nil {
 		return err
 	}
