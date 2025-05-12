@@ -1,0 +1,1 @@
+assetcli register-or-update-client-chain --rpcUrl http://localhost:8545 --privateKey C26A874A75B028638D477DDF31EB8627899CB505798DF70D2DD2A631F9CAE7A4 --clientChainID 202 --addressLength 32 --name Solana --metaInfo "Solana Official" --signatureType "ed25519"

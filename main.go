@@ -504,7 +504,7 @@ var (
 var rootCmd = &cobra.Command{
 	Use:     "assetcli",
 	Short:   "Asset CLI tool",
-	Version: "0.0.3",
+	Version: "0.0.6",
 }
 
 var depositCmd = &cobra.Command{
@@ -629,6 +629,54 @@ var cancelSelfDelegateCmd = &cobra.Command{
 	},
 }
 
+var registerTokenCmd = &cobra.Command{
+	Use:   "register-token",
+	Short: "Register token to Exocore",
+	Run: func(cmd *cobra.Command, args []string) {
+		rpcUrl, _ := cmd.Flags().GetString("rpcUrl")
+		assetAddress, _ := cmd.Flags().GetString("assetAddress")
+		decimals, _ := cmd.Flags().GetUint8("decimals")
+		name, _ := cmd.Flags().GetString("name")
+		metaData, _ := cmd.Flags().GetString("metaData")
+		oracleInfo, _ := cmd.Flags().GetString("oracleInfo")
+		err := registerToken_(rpcUrl, assetAddress, decimals, name, metaData, oracleInfo)
+		if err != nil {
+			log.Fatalf("Failed to register token: %v", err)
+		}
+	},
+}
+
+var updateTokenCmd = &cobra.Command{
+	Use:  "update-token",
+	Short: "Update token to Exocore",
+	Run: func(cmd *cobra.Command, args []string) {
+		rpcUrl, _ := cmd.Flags().GetString("rpcUrl")
+		assetAddress, _ := cmd.Flags().GetString("assetAddress")
+		metaData, _ := cmd.Flags().GetString("metaData")
+		err := updateToken_(rpcUrl, assetAddress, metaData)
+		if err != nil {
+			log.Fatalf("Failed to update token: %v", err)
+		}
+	},
+}
+
+var registerOrUpdateClientChainCmd = &cobra.Command{
+	Use:   "register-or-update-client-chain",
+	Short: "Register or update client chain to Exocore",
+	Run: func(cmd *cobra.Command, args []string) {
+		rpcUrl, _ := cmd.Flags().GetString("rpcUrl")
+		clientChainID, _ := cmd.Flags().GetUint32("clientChainID")
+		addressLength, _ := cmd.Flags().GetUint8("addressLength")
+		name, _ := cmd.Flags().GetString("name")
+		metaInfo, _ := cmd.Flags().GetString("metaInfo")
+		signatureType, _ := cmd.Flags().GetString("signatureType")
+		err := registerOrUpdateClientChain_(rpcUrl, clientChainID, addressLength, name, metaInfo, signatureType)
+		if err != nil {
+			log.Fatalf("Failed to register or update client chain: %v", err)
+		}
+	},
+}	
+
 var withdrawLSTCmd = &cobra.Command{
 	Use:   "withdraw",
 	Short: "WithdrawLST from Exocore",
@@ -660,6 +708,9 @@ func main() {
 	rootCmd.AddCommand(depositNSTCmd)
 	rootCmd.AddCommand(withdrawNSTCmd)
 	rootCmd.AddCommand(cancelSelfDelegateCmd)
+	rootCmd.AddCommand(registerTokenCmd)
+	rootCmd.AddCommand(updateTokenCmd)
+	rootCmd.AddCommand(registerOrUpdateClientChainCmd)
 
 	depositCmd.Flags().String("rpcUrl", "http://localhost:8545", "Exocore RPC URL")
 	depositCmd.Flags().String("staker", "", "Staker address")
@@ -695,6 +746,24 @@ func main() {
 
 	cancelSelfDelegateCmd.Flags().String("rpcUrl", "http://localhost:8545", "Exocore RPC URL")
 	cancelSelfDelegateCmd.Flags().String("staker", "", "Staker address")
+
+	registerTokenCmd.Flags().String("rpcUrl", "http://localhost:8545", "Exocore RPC URL")
+	registerTokenCmd.Flags().String("assetAddress", "", "Asset address")
+	registerTokenCmd.Flags().Uint8("decimals", 0, "Decimals")
+	registerTokenCmd.Flags().String("name", "", "Token name")
+	registerTokenCmd.Flags().String("metaData", "", "Meta data")
+	registerTokenCmd.Flags().String("oracleInfo", "", "Oracle info")
+
+	updateTokenCmd.Flags().String("rpcUrl", "http://localhost:8545", "Exocore RPC URL")
+	updateTokenCmd.Flags().String("assetAddress", "", "Asset address")
+	updateTokenCmd.Flags().String("metaData", "", "Meta data")
+
+	registerOrUpdateClientChainCmd.Flags().String("rpcUrl", "http://localhost:8545", "Exocore RPC URL")
+	registerOrUpdateClientChainCmd.Flags().Uint32("clientChainID", 0, "Client chain ID")
+	registerOrUpdateClientChainCmd.Flags().Uint8("addressLength", 0, "Address length")
+	registerOrUpdateClientChainCmd.Flags().String("name", "", "Name")
+	registerOrUpdateClientChainCmd.Flags().String("metaInfo", "", "Meta info")
+	registerOrUpdateClientChainCmd.Flags().String("signatureType", "", "Signature type")
 
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatalf("Error executing command: %v", err)
@@ -1028,6 +1097,121 @@ func withdrawNST_(rpcUrl, pubkey string, stakerAddress string, amount *big.Int) 
 	}
 
 	fmt.Println("Withdraw NST Transaction ID:", txID)
+	return waitForTransaction(ethClient, txID)
+}
+
+func registerToken_(rpcUrl, assetAddress string, decimals uint8, name string, metaData string, oracleInfo string) error {
+	depositAddr := common.HexToAddress(depositPrecompileAddress)
+	assetAddr := common.HexToAddress(assetAddress)
+	token := paddingAddressTo32(assetAddr)
+
+	_, ethClient, err := connectToEthereum(rpcUrl)
+	if err != nil {
+		return err
+	}
+
+	sk, callAddr, err := getPrivateKeyAndAddress(privateKey)
+	if err != nil {
+		return err
+	}
+
+	chainID, err := ethClient.ChainID(context.Background())
+	if err != nil {
+		return err
+	}
+
+	depositAbi, err := abi.JSON(strings.NewReader(DepositABI))
+	if err != nil {
+		return err
+	}
+
+	data, err := depositAbi.Pack("registerToken", layerZeroID, token, decimals, name, metaData, oracleInfo)
+	if err != nil {
+		return err
+	}
+
+	txID, err := sendTransaction(ethClient, chainID, callAddr, sk, depositAddr, data)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("RegisterToken Transaction ID:", txID)
+	return waitForTransaction(ethClient, txID)
+}
+
+func updateToken_(rpcUrl, assetAddress string, metaData string) error {
+	depositAddr := common.HexToAddress(depositPrecompileAddress)
+	assetAddr := common.HexToAddress(assetAddress)
+	token := paddingAddressTo32(assetAddr)
+
+	_, ethClient, err := connectToEthereum(rpcUrl)
+	if err != nil {
+		return err
+	}
+
+	sk, callAddr, err := getPrivateKeyAndAddress(privateKey)
+	if err != nil {
+		return err
+	}
+
+	chainID, err := ethClient.ChainID(context.Background())
+	if err != nil {
+		return err
+	}
+
+	depositAbi, err := abi.JSON(strings.NewReader(DepositABI))
+	if err != nil {
+		return err
+	}
+
+	data, err := depositAbi.Pack("updateToken", layerZeroID, token, metaData)
+	if err != nil {
+		return err
+	}
+
+	txID, err := sendTransaction(ethClient, chainID, callAddr, sk, depositAddr, data)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("updateToken Transaction ID:", txID)
+	return waitForTransaction(ethClient, txID)
+}
+
+func registerOrUpdateClientChain_(rpcUrl string, clientChainID uint32, addressLength uint8, name string, metaInfo string, signatureType string) error {
+	depositAddr := common.HexToAddress(depositPrecompileAddress)
+
+	_, ethClient, err := connectToEthereum(rpcUrl)
+	if err != nil {
+		return err
+	}
+
+	sk, callAddr, err := getPrivateKeyAndAddress(privateKey)
+	if err != nil {
+		return err
+	}
+
+	chainID, err := ethClient.ChainID(context.Background())
+	if err != nil {
+		return err
+	}
+
+	depositAbi, err := abi.JSON(strings.NewReader(DepositABI))
+	if err != nil {
+		return err
+	}
+
+	data, err := depositAbi.Pack("registerOrUpdateClientChain", clientChainID, addressLength, name, metaInfo, signatureType)
+	if err != nil {
+		return err
+	}
+
+	txID, err := sendTransaction(ethClient, chainID, callAddr, sk, depositAddr, data)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("registerOrUpdateClientChain Transaction ID:", txID)
 	return waitForTransaction(ethClient, txID)
 }
 
