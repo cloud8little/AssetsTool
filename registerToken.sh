@@ -1,0 +1,1 @@
+assetcli register-token --rpcUrl http://localhost:8545 --privateKey D196DCA836F8AC2FFF45B3C9F0113825CCBB33FA1B39737B948503B263ED75AE --assetAddress 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee --decimals 9 --name SOL --metaData "SOL for Solana" --oracleInfo "SOL,solana,8" --layerZeroID 202
