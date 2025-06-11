@@ -737,6 +737,7 @@ func main() {
 	undelegateCmd.Flags().String("staker", "", "Staker address")
 	undelegateCmd.Flags().String("operator", "", "Operator address")
 	undelegateCmd.Flags().String("amount", "0", "Amount to undelegate")
+	undelegateCmd.Flags().Bool("instantUnbond", false, "Instant unbond")
 
 	selfDelegateCmd.Flags().String("rpcUrl", "http://localhost:8545", "Exocore RPC URL")
 	selfDelegateCmd.Flags().String("staker", "", "Staker address")
