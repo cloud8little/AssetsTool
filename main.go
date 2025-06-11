@@ -358,6 +358,7 @@ const (
       "type": "function"
     }
   ]`
+
 	DelegateABI               = `[
   {
     "type": "function",
@@ -479,6 +480,11 @@ const (
         "name": "opAmount",
         "type": "uint256",
         "internalType": "uint256"
+      },
+      {
+        "name": "instantUnbond",
+        "type": "bool",
+        "internalType": "bool"
       }
     ],
     "outputs": [
@@ -490,7 +496,8 @@ const (
     ],
     "stateMutability": "nonpayable"
   }
-]`
+]
+`
 	depositPrecompileAddress  = "0x0000000000000000000000000000000000000804"
 	delegatePrecompileAddress = "0x0000000000000000000000000000000000000805"
 )
@@ -504,7 +511,7 @@ var (
 var rootCmd = &cobra.Command{
 	Use:     "assetcli",
 	Short:   "Asset CLI tool",
-	Version: "0.0.6",
+	Version: "0.0.7",
 }
 
 var depositCmd = &cobra.Command{
@@ -592,10 +599,11 @@ var undelegateCmd = &cobra.Command{
 		operator, _ := cmd.Flags().GetString("operator")
 		amountStr, _ := cmd.Flags().GetString("amount")
 		amount, ok := new(big.Int).SetString(amountStr, 10)
+		instantUnbond, _ := cmd.Flags().GetBool("instantUnbond")
 		if !ok {
 			log.Fatalf("Invalid amount: %s", amountStr)
 		}
-		err := undelegate_(rpcUrl, staker, operator, amount)
+		err := undelegate_(rpcUrl, staker, operator, amount, instantUnbond)
 		if err != nil {
 			log.Fatalf("Failed to undelegate: %v", err)
 		}
@@ -772,7 +780,11 @@ func main() {
 
 func deposit_(rpcUrl, stakerAddress string, amount *big.Int) error {
 	depositAddr := common.HexToAddress(depositPrecompileAddress)
-	assetAddr := common.HexToAddress(defaultAssetID)
+	assetAddr, err := assetToBytes(defaultAssetID)
+	if err != nil {
+		return err
+	}
+	// assetAddr := common.HexToAddress(defaultAssetID)
 	stakerAddr := common.HexToAddress(stakerAddress)
 	opAmount := amount
 
@@ -796,7 +808,7 @@ func deposit_(rpcUrl, stakerAddress string, amount *big.Int) error {
 		return err
 	}
 
-	data, err := depositAbi.Pack("depositLST", layerZeroID, paddingAddressTo32(assetAddr), paddingAddressTo32(stakerAddr), opAmount)
+	data, err := depositAbi.Pack("depositLST", layerZeroID, assetAddr, paddingAddressTo32(stakerAddr), opAmount)
 	if err != nil {
 		return err
 	}
@@ -812,7 +824,11 @@ func deposit_(rpcUrl, stakerAddress string, amount *big.Int) error {
 
 func delegateTo_(rpcUrl, stakerAddress, operatorBench32Str string, amount *big.Int) error {
 	delegateAddr := common.HexToAddress(delegatePrecompileAddress)
-	assetAddr := common.HexToAddress(defaultAssetID)
+	assetAddr, err := assetToBytes(defaultAssetID)
+	if err != nil {
+		return err
+	}
+	// assetAddr := common.HexToAddress(defaultAssetID)
 	stakerAddr := common.HexToAddress(stakerAddress)
 	operatorAddr := []byte(operatorBench32Str)
 	opAmount := amount
@@ -836,7 +852,7 @@ func delegateTo_(rpcUrl, stakerAddress, operatorBench32Str string, amount *big.I
 		return err
 	}
 
-	data, err := delegateAbi.Pack("delegate", layerZeroID, paddingAddressTo32(assetAddr), paddingAddressTo32(stakerAddr), operatorAddr, opAmount)
+	data, err := delegateAbi.Pack("delegate", layerZeroID, assetAddr, paddingAddressTo32(stakerAddr), operatorAddr, opAmount)
 	if err != nil {
 		return err
 	}
@@ -850,9 +866,13 @@ func delegateTo_(rpcUrl, stakerAddress, operatorBench32Str string, amount *big.I
 	return waitForTransaction(ethClient, txID)
 }
 
-func undelegate_(rpcUrl, stakerAddress, operatorBench32Str string, amount *big.Int) error {
+func undelegate_(rpcUrl, stakerAddress, operatorBench32Str string, amount *big.Int, instantUnbond bool) error {
 	delegateAddr := common.HexToAddress(delegatePrecompileAddress)
-	assetAddr := common.HexToAddress(defaultAssetID)
+	assetAddr, err := assetToBytes(defaultAssetID)
+	if err != nil {
+		return err
+	}
+	// assetAddr := common.HexToAddress(defaultAssetID)
 	stakerAddr := common.HexToAddress(stakerAddress)
 	operatorAddr := []byte(operatorBench32Str)
 	opAmount := amount
@@ -877,7 +897,7 @@ func undelegate_(rpcUrl, stakerAddress, operatorBench32Str string, amount *big.I
 		return err
 	}
 
-	data, err := delegateAbi.Pack("undelegate", layerZeroID, paddingAddressTo32(assetAddr), paddingAddressTo32(stakerAddr), operatorAddr, opAmount)
+	data, err := delegateAbi.Pack("undelegate", layerZeroID, assetAddr, paddingAddressTo32(stakerAddr), operatorAddr, opAmount, instantUnbond)
 	if err != nil {
 		return err
 	}
@@ -978,7 +998,11 @@ func cancelSelfDelegate_(rpcUrl, stakerAddr string) error {
 
 func withdrawLST_(rpcUrl, stakerAddress string, amount *big.Int) error {
 	depositAddr := common.HexToAddress(depositPrecompileAddress)
-	assetAddr := common.HexToAddress(defaultAssetID)
+	assetAddr, err := assetToBytes(defaultAssetID)
+	if err != nil {
+		return err
+	}
+	// assetAddr := common.HexToAddress(defaultAssetID)
 	stakerAddr := common.HexToAddress(stakerAddress)
 	opAmount := amount
 
@@ -1002,7 +1026,7 @@ func withdrawLST_(rpcUrl, stakerAddress string, amount *big.Int) error {
 		return err
 	}
 
-	data, err := depositAbi.Pack("withdrawLST", layerZeroID, paddingAddressTo32(assetAddr), paddingAddressTo32(stakerAddr), opAmount)
+	data, err := depositAbi.Pack("withdrawLST", layerZeroID, assetAddr, paddingAddressTo32(stakerAddr), opAmount)
 	if err != nil {
 		return err
 	}
@@ -1102,8 +1126,15 @@ func withdrawNST_(rpcUrl, pubkey string, stakerAddress string, amount *big.Int) 
 
 func registerToken_(rpcUrl, assetAddress string, decimals uint8, name string, metaData string, oracleInfo string) error {
 	depositAddr := common.HexToAddress(depositPrecompileAddress)
-	assetAddr := common.HexToAddress(assetAddress)
-	token := paddingAddressTo32(assetAddr)
+	var token []byte
+	if len(assetAddress) == 42 {
+		assetAddr := common.HexToAddress(assetAddress)
+		token = paddingAddressTo32(assetAddr)
+	} else if len(assetAddress) == 66 {
+		token = common.Hex2Bytes(strings.TrimPrefix(assetAddress, "0x"))
+	} else {
+		return fmt.Errorf("invalid asset address length: %d", len(assetAddress))
+	}
 
 	_, ethClient, err := connectToEthereum(rpcUrl)
 	if err != nil {
@@ -1242,6 +1273,16 @@ func paddingAddressTo32(address common.Address) []byte {
 	}
 	fmt.Println("Padded address:", hexutil.Encode(ret))
 	return ret
+}
+
+func assetToBytes(assetAddress string) ([]byte, error) {
+	if len(assetAddress) == 42 {
+		assetAddr := common.HexToAddress(assetAddress)
+		return paddingAddressTo32(assetAddr), nil
+	} else if len(assetAddress) == 66 {
+		return common.Hex2Bytes(strings.TrimPrefix(assetAddress, "0x")), nil
+	}
+	return nil, fmt.Errorf("invalid asset address length: %d", len(assetAddress))
 }
 
 func sendTransaction(client *ethclient.Client, chainID *big.Int, from common.Address, sk *ecdsa.PrivateKey, to common.Address, data []byte) (string, error) {
