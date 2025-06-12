@@ -511,7 +511,7 @@ var (
 var rootCmd = &cobra.Command{
 	Use:     "assetcli",
 	Short:   "Asset CLI tool",
-	Version: "0.0.7",
+	Version: "0.0.8",
 }
 
 var depositCmd = &cobra.Command{

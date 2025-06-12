@@ -31,6 +31,6 @@ release:
 		release --clean --skip validate
 
 build:
-	go build -o ./build/assetsTool
+	go build -o ./build/assetcli
 
 .PHONY: build
