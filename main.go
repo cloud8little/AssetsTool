@@ -598,44 +598,52 @@ const (
     "inputs":
     [
       {
-        "internalType": "uint32",
-        "name": "clientChainID",
-        "type": "uint32"
-      },
-      {
-        "internalType": "bytes",
-        "name": "token",
-        "type": "bytes"
-      },
-      {
-        "internalType": "uint8",
-        "name": "decimals",
-        "type": "uint8"
-      },
-      {
-        "internalType": "string",
-        "name": "name",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "symbol",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "metaData",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "denomination",
-        "type": "string"
-      },
-      {
-        "internalType": "uint8",
-        "name": "denominationExponent",
-        "type": "uint8"
+        "components":
+        [
+          {
+            "internalType": "uint32",
+            "name": "clientChainID",
+            "type": "uint32"
+          },
+          {
+            "internalType": "bytes",
+            "name": "token",
+            "type": "bytes"
+          },
+          {
+            "internalType": "uint8",
+            "name": "decimals",
+            "type": "uint8"
+          },
+          {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "metaData",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "denomination",
+            "type": "string"
+          },
+          {
+            "internalType": "uint8",
+            "name": "denominationExponent",
+            "type": "uint8"
+          }
+        ],
+        "internalType": "struct RegisterRewardTokenParams",
+        "name": "params",
+        "type": "tuple"
       }
     ],
     "name": "registerRewardToken",
@@ -854,39 +862,47 @@ const (
     "inputs":
     [
       {
-        "internalType": "uint32",
-        "name": "clientChainLzID",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint32",
-        "name": "rewardAssetChainLzID",
-        "type": "uint32"
-      },
-      {
-        "internalType": "bytes",
-        "name": "assetAddress",
-        "type": "bytes"
-      },
-      {
-        "internalType": "bytes",
-        "name": "stakerAddress",
-        "type": "bytes"
-      },
-      {
-        "internalType": "bytes",
-        "name": "operatorAddr",
-        "type": "bytes"
-      },
-      {
-        "internalType": "uint256",
-        "name": "opAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bool",
-        "name": "instantUnbond",
-        "type": "bool"
+        "components":
+        [
+          {
+            "internalType": "uint32",
+            "name": "clientChainLzID",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "rewardAssetChainLzID",
+            "type": "uint32"
+          },
+          {
+            "internalType": "bytes",
+            "name": "assetAddress",
+            "type": "bytes"
+          },
+          {
+            "internalType": "bytes",
+            "name": "stakerAddress",
+            "type": "bytes"
+          },
+          {
+            "internalType": "string",
+            "name": "operatorAddr",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "opAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "instantUnbond",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct UndelegateRewardParams",
+        "name": "params",
+        "type": "tuple"
       }
     ],
     "name": "undelegateReward",
@@ -1018,29 +1034,37 @@ const (
     "inputs":
     [
       {
-        "internalType": "bool",
-        "name": "doClaim",
-        "type": "bool"
-      },
-      {
-        "internalType": "uint32",
-        "name": "clientChainLzID",
-        "type": "uint32"
-      },
-      {
-        "internalType": "bytes",
-        "name": "stakerAddress",
-        "type": "bytes"
-      },
-      {
-        "internalType": "bytes",
-        "name": "receiptAddress",
-        "type": "bytes"
-      },
-      {
-        "internalType": "uint256",
-        "name": "opAmount",
-        "type": "uint256"
+        "components":
+        [
+          {
+            "internalType": "bool",
+            "name": "doClaim",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint32",
+            "name": "clientChainLzID",
+            "type": "uint32"
+          },
+          {
+            "internalType": "bytes",
+            "name": "stakerAddress",
+            "type": "bytes"
+          },
+          {
+            "internalType": "bytes",
+            "name": "receiptAddress",
+            "type": "bytes"
+          },
+          {
+            "internalType": "uint256",
+            "name": "opAmount",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct WithdrawIMUATokenRewardParams",
+        "name": "params",
+        "type": "tuple"
       }
     ],
     "name": "withdrawIMUATokenReward",
@@ -1069,34 +1093,42 @@ const (
     "inputs":
     [
       {
-        "internalType": "bool",
-        "name": "doClaim",
-        "type": "bool"
-      },
-      {
-        "internalType": "uint32",
-        "name": "clientChainLzID",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint32",
-        "name": "rewardAssetChainLzID",
-        "type": "uint32"
-      },
-      {
-        "internalType": "bytes",
-        "name": "assetAddress",
-        "type": "bytes"
-      },
-      {
-        "internalType": "bytes",
-        "name": "stakerAddress",
-        "type": "bytes"
-      },
-      {
-        "internalType": "uint256",
-        "name": "opAmount",
-        "type": "uint256"
+        "components":
+        [
+          {
+            "internalType": "bool",
+            "name": "doClaim",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint32",
+            "name": "clientChainLzID",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "rewardAssetChainLzID",
+            "type": "uint32"
+          },
+          {
+            "internalType": "bytes",
+            "name": "assetAddress",
+            "type": "bytes"
+          },
+          {
+            "internalType": "bytes",
+            "name": "stakerAddress",
+            "type": "bytes"
+          },
+          {
+            "internalType": "uint256",
+            "name": "opAmount",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct WithdrawRewardParams",
+        "name": "params",
+        "type": "tuple"
       }
     ],
     "name": "withdrawReward",
@@ -1356,7 +1388,7 @@ var isRegisteredRewardTokenCmd = &cobra.Command{
 			fmt.Println("Reward token is registered")
 		} else {
 			fmt.Println("Reward token is not registered")
-		}	
+		}
 	},
 }
 
@@ -2549,7 +2581,7 @@ func setStakerRewardParams_(rpcUrl string, clientChainID uint32, stakerAddress s
 func undelegateReward_(rpcUrl string, clientChainID uint32, rewardAssetChainID uint32, stakerAddress string, operatorBench32Str string, amount *big.Int, instantUnbond bool) error {
 	rewardAddr := common.HexToAddress(rewardPrecompileAddress)
 	stakerAddr := common.HexToAddress(stakerAddress)
-	operatorAddr := []byte(operatorBench32Str)
+	operatorAddr := operatorBench32Str
 	assetAddr, err := assetToBytes(defaultAssetID)
 	if err != nil {
 		return err
@@ -2575,7 +2607,39 @@ func undelegateReward_(rpcUrl string, clientChainID uint32, rewardAssetChainID u
 		return err
 	}
 
-	data, err := rewardAbi.Pack("undelegateReward", clientChainID, rewardAssetChainID, assetAddr, paddingAddressTo32(stakerAddr), operatorAddr, amount, instantUnbond)
+	// Create tuple for parameters
+	type tuple struct {
+		ClientChainLzID      uint32
+		RewardAssetChainLzID   uint32
+		AssetAddr             []byte
+		StakerAddr            [32]byte
+		OperatorAddr          string
+		OpAmount              *big.Int
+		InstantUnbond         bool
+	}
+
+	// Include clientChainLzID in the parameters
+	stakerAddrBytes := paddingAddressTo32(stakerAddr)
+
+	params := struct {
+		ClientChainLzID uint32
+		RewardAssetChainLzID uint32
+		AssetAddress []byte
+		StakerAddress []byte
+		OperatorAddr string
+		OpAmount *big.Int
+		InstantUnbond bool
+	}{
+		ClientChainLzID: clientChainID,
+		RewardAssetChainLzID: rewardAssetChainID,
+		AssetAddress: assetAddr,
+		StakerAddress: stakerAddrBytes,
+		OperatorAddr: operatorAddr,
+		OpAmount: amount,
+		InstantUnbond: instantUnbond,
+	}
+
+	data, err := rewardAbi.Pack("undelegateReward", params)
 	if err != nil {
 		return err
 	}
@@ -2714,7 +2778,6 @@ func withdrawIMUATokenCommission_(rpcUrl string, operatorBench32Str string, rece
 func withdrawIMUATokenReward_(rpcUrl string, clientChainID uint32, stakerAddress string, receiptAddress string, amount *big.Int) error {
 	rewardAddr := common.HexToAddress(rewardPrecompileAddress)
 	stakerAddr := common.HexToAddress(stakerAddress)
-	receiptAddr := []byte(receiptAddress)
 
 	_, ethClient, err := connectToEthereum(rpcUrl)
 	if err != nil {
@@ -2738,7 +2801,26 @@ func withdrawIMUATokenReward_(rpcUrl string, clientChainID uint32, stakerAddress
 
 	// doClaim is set to true by default
 	doClaim := true
-	data, err := rewardAbi.Pack("withdrawIMUATokenReward", doClaim, clientChainID, paddingAddressTo32(stakerAddr), receiptAddr, amount)
+	stakerAddrBytes := paddingAddressTo32(stakerAddr)
+	// convert the receipt address to bytes, receiptAddress remove 0x prefix
+	receiptAddress = strings.TrimPrefix(receiptAddress, "0x")
+	receiptAddrBytes := common.Hex2Bytes(receiptAddress)
+	fmt.Println("receiptAddrBytes:", hexutil.Encode(receiptAddrBytes))
+	params := struct {
+		DoClaim bool
+		ClientChainLzID uint32
+		StakerAddress []byte
+		ReceiptAddress []byte
+		OpAmount *big.Int
+	}{
+		DoClaim: doClaim,
+		ClientChainLzID: clientChainID,
+		StakerAddress: stakerAddrBytes,
+		ReceiptAddress: receiptAddrBytes,
+		OpAmount: amount,
+	}
+	// pack the params into struct
+	data, err := rewardAbi.Pack("withdrawIMUATokenReward", params)
 	if err != nil {
 		return err
 	}
@@ -2779,10 +2861,27 @@ func withdrawReward_(rpcUrl string, clientChainID uint32, rewardAssetChainID uin
 	if err != nil {
 		return err
 	}
-
 	// doClaim is set to true by default
 	doClaim := true
-	data, err := rewardAbi.Pack("withdrawReward", doClaim, clientChainID, rewardAssetChainID, assetAddr, paddingAddressTo32(stakerAddr), amount)
+	stakerAddrBytes := paddingAddressTo32(stakerAddr)
+
+	params := struct {
+		DoClaim bool
+		ClientChainLzID uint32
+		RewardAssetChainLzID uint32
+		AssetAddress []byte
+		StakerAddress []byte
+		OpAmount *big.Int
+	}{
+		DoClaim: doClaim,
+		ClientChainLzID: clientChainID,
+		RewardAssetChainLzID: rewardAssetChainID,
+		AssetAddress: assetAddr,
+		StakerAddress: stakerAddrBytes,
+		OpAmount: amount,
+	}
+
+	data, err := rewardAbi.Pack("withdrawReward", params)
 	if err != nil {
 		return err
 	}
