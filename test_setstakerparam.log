@@ -1,0 +1,89 @@
+Padded address: 0x884958ffb23885a13b5d51617f05f2b8b20f0405000000000000000000000000
+the txID is: 0x23c2f051f6b9776b81851046f20f3ca77eb4950e5a0dfff9fbd5ea158e418975
+The bool value returned by the contract: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1]
+Set Staker Reward Params Transaction ID: 0x23c2f051f6b9776b81851046f20f3ca77eb4950e5a0dfff9fbd5ea158e418975
+check staker reward params
+reward_params:
+  redelegate_operator_addr: im13py43laj8zz6zw6a29sh7p0jhzeq7pq923hdp5
+  redelegate_reward: true
+check current epoch number
+Current epoch number: 1
+Waiting for epoch to reach 2...
+Current epoch number: 1
+Current epoch number: 1
+Current epoch number: 1
+Current epoch number: 1
+Current epoch number: 2
+send a undelegate transaction
+Padded address: 0x80e5bb3a04554e54b40dd6e14ca0f97212d9428d000000000000000000000000
+Padded address: 0x884958ffb23885a13b5d51617f05f2b8b20f0405000000000000000000000000
+the txID is: 0x7715506a2fd50c2788e0c524a66a9e0f67eb621a7f5403ef97460f2bee5018a2
+The bool value returned by the contract: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1]
+Undelegate Transaction ID: 0x7715506a2fd50c2788e0c524a66a9e0f67eb621a7f5403ef97460f2bee5018a2
+check staker unclaimed rewards at epoch 2
+compounding_rewards: []
+rewards: []
+check staker claimed rewards at epoch 2
+wait for epoch 3
+Waiting for epoch to reach 3...
+Current epoch number: 2
+Current epoch number: 2
+Current epoch number: 2
+Current epoch number: 2
+Current epoch number: 3
+check staker unclaimed rewards
+compounding_rewards: []
+rewards:
+- avs_address: 0xedb7a6077ab45df72e57bc2ea091f9183429720e
+  rewards:
+  - amount: "45649284609762822598.000000000000000000"
+    denom: hua
+check staker claimed rewards
+staker_claimed_rewards:
+  delegation_rewards_shares:
+  - operator_addr: im13py43laj8zz6zw6a29sh7p0jhzeq7pq923hdp5
+    shares:
+    - amount: "136947857846226255513.000000000000000000"
+      denom: hua
+  historical_total_rewards:
+  - amount: "136947857846226255513.315458924069040000"
+    denom: hua
+  outstanding_rewards: []
+  pending_slashed_rewards: []
+  pending_undelegation_rewards: []
+  withdrawable_rewards: []
+  withdrawn_rewards: []
+operator assets
+asset_infos:
+- asset_id: 0x0000000000000000000000000000000000000000_0x0
+  info:
+    operator_share: "136947857846226255513.000000000000000000"
+    pending_undelegation_amount: "0"
+    total_amount: "136947857846226255513"
+    total_share: "136947857846226255513.000000000000000000"
+- asset_id: 0x32118ebd4b82a84b0f13218dba41f352cc7c2923_0x9d19
+  info:
+    operator_share: "0.000000000000000000"
+    pending_undelegation_amount: "0"
+    total_amount: "0"
+    total_share: "0.000000000000000000"
+- asset_id: 0x80e5bb3a04554e54b40dd6e14ca0f97212d9428d_0x9d19
+  info:
+    operator_share: "1499000000000000000000.000000000000000000"
+    pending_undelegation_amount: "1000000000000000000"
+    total_amount: "1985201000000000000000"
+    total_share: "1985201000000000000000.000000000000000000"
+- asset_id: 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee_0x9d19
+  info:
+    operator_share: "0.000000000000000000"
+    pending_undelegation_amount: "0"
+    total_amount: "2000000000000000000"
+    total_share: "2000000000000000000.000000000000000000"
+operator unclaimed rewards
+operator_unclaimed_rewards:
+  compounding_rewards_slashed: []
+  outstanding_rewards:
+  - amount: "44572054098923669365.000000000000000000"
+    denom: hua
+  outstanding_rewards_slashed: []
+  rewards_from_compounding: []
